@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <utility>
 
 namespace fs
 {
@@ -149,6 +150,8 @@ namespace fs
 
 		oldPathParentDir->DeleteFile(fileToMove);
 		Directory::AddFileToDirectory(newPathParentDir, fileToMove);
+
+		NotifyFilePathChanged(fileToMove, oldPath);
 	}
 	void DirectoryTree::MoveDirectory(const std::filesystem::path& oldPath, const std::filesystem::path& newPath)
 	{
@@ -164,17 +167,14 @@ namespace fs
 
 		assert(directoryToMove && "Cannot move a directory that doesn't exist");
 
-		// First, we have to resolve connections of the directorie's entities
-		// with their respective old paths. So, basically we have to assing
-		// new keys to the entities inside the directory being moved
+		// ResolveChangedPathDirectory(newPath, std::filesystem::path{}, directoryToMove);
 
-		// Yeah, naming... Hope I can find better wording here...
-		std::filesystem::path relPathToMovedDir = oldPath.filename();
-		// ResolveMovedDirectoryMapLinks(newPathParentPath, relPathToMovedDir, directoryToMove);
-		ResolveDirectoryMapLinks(newPath, std::filesystem::path{}, directoryToMove);
+		EntityPathPairs entities = ConstructDirEntityPathPairs(directoryToMove);
 
 		oldPathParentDir->DeleteDirectory(directoryToMove);
 		Directory::AddDirectoryToDirectory(newPathParentDir, directoryToMove);
+
+		ProcessPathChanges(entities);
 	}
 
 	void DirectoryTree::ProcessModifiedFile(const std::filesystem::path& oldPath)
@@ -225,6 +225,8 @@ namespace fs
 		assert(fileToRename && "Can't rename a file that doesn't exist");
 
 		fileToRename->Rename(newPath.filename().generic_string());
+
+		NotifyFilePathChanged(fileToRename, oldPath);
 	}
 	void DirectoryTree::RenameDirectory(const std::filesystem::path& oldPath, const std::filesystem::path& newPath)
 	{
@@ -240,9 +242,13 @@ namespace fs
 
 		assert(dirToRename && "Can't rename a directory that doesn't exist");
 
-		ResolveDirectoryMapLinks(newPath, std::filesystem::path{}, dirToRename);
+		// ResolveChangedPathDirectory(newPath, std::filesystem::path{}, dirToRename);
+
+		EntityPathPairs entities = ConstructDirEntityPathPairs(dirToRename);
 
 		dirToRename->Rename(newPath.filename().generic_string());
+
+		ProcessPathChanges(entities);
 	}
 
 	void DirectoryTree::ProcessDirectoryTree(DirectoryTreeProcessor* processor)
@@ -269,7 +275,7 @@ namespace fs
 	{
 		std::for_each(
 			listeners.begin(), listeners.end(),
-			[dir](DirectoryTreeEventListener* listener) {
+			[&dir](DirectoryTreeEventListener* listener) {
 				listener->OnDirectoryAdded(dir);
 		});
 	}
@@ -277,15 +283,23 @@ namespace fs
 	{
 		std::for_each(
 			listeners.begin(), listeners.end(),
-			[dir](DirectoryTreeEventListener* listener) {
+			[&dir](DirectoryTreeEventListener* listener) {
 				listener->OnDirectoryRemoved(dir);
 		});
+	}
+	void DirectoryTree::NotifyDirectoryPathChanged(std::shared_ptr<Directory> dir, const std::filesystem::path& oldPath)
+	{
+		std::for_each(
+			listeners.begin(), listeners.end(),
+			[&dir, &oldPath](DirectoryTreeEventListener* listener) {
+				listener->OnDirectoryPathChanged(dir, oldPath);
+			});
 	}
 	void DirectoryTree::NotifyDirectoryModified(std::shared_ptr<Directory> dir)
 	{
 		std::for_each(
 			listeners.begin(), listeners.end(),
-			[dir](DirectoryTreeEventListener* listener) {
+			[&dir](DirectoryTreeEventListener* listener) {
 				listener->OnDirectoryModified(dir);
 			});
 	}
@@ -294,7 +308,7 @@ namespace fs
 	{
 		std::for_each(
 			listeners.begin(), listeners.end(),
-			[file](DirectoryTreeEventListener* listener) {
+			[&file](DirectoryTreeEventListener* listener) {
 				listener->OnFileAdded(file);
 		});
 	}
@@ -302,15 +316,23 @@ namespace fs
 	{
 		std::for_each(
 			listeners.begin(), listeners.end(),
-			[file](DirectoryTreeEventListener* listener) {
+			[&file](DirectoryTreeEventListener* listener) {
 				listener->OnFileRemoved(file);
 		});
+	}
+	void DirectoryTree::NotifyFilePathChanged(std::shared_ptr<File> file, const std::filesystem::path& oldPath)
+	{
+		std::for_each(
+			listeners.begin(), listeners.end(),
+			[&file, &oldPath](DirectoryTreeEventListener* listener) {
+				listener->OnFilePathChanged(file, oldPath);
+			});
 	}
 	void DirectoryTree::NotifyFileModified(std::shared_ptr<File> file)
 	{
 		std::for_each(
 			listeners.begin(), listeners.end(),
-			[file](DirectoryTreeEventListener* listener) {
+			[&file](DirectoryTreeEventListener* listener) {
 				listener->OnFileModified(file);
 			});
 	}
@@ -363,7 +385,8 @@ namespace fs
 		return parentDir;
 	}
 
-	void DirectoryTree::ResolveDirectoryMapLinks(
+	/*
+	void DirectoryTree::ResolveChangedPathDirectory(
 		const std::filesystem::path& newDirPath,
 		const std::filesystem::path& relPathToDir,
 		std::shared_ptr<Directory> relPathDir)
@@ -372,11 +395,14 @@ namespace fs
 		if (!relPathToDir.empty())
 			newKeyPath = newDirPath / relPathToDir;
 
-		auto search = directories.find(relPathDir->GetPath());
-		assert(search != directories.end() && "Can't find the directory with the old key");
-		directories.erase(search);
-
+		directories.erase(relPathDir->GetPath());
 		directories.insert({ newKeyPath, relPathDir });
+
+		NotifyDirectoryPathChanged(relPathDir, newKeyPath);
+		for (auto& file : relPathDir->GetFiles())
+		{
+			NotifyFilePathChanged(file, newKeyPath / file->GetName());
+		}
 
 		for (auto& dir : relPathDir->GetDirectories())
 		{
@@ -384,7 +410,38 @@ namespace fs
 			assert(search != directories.end() && "Can't find the directory currently being iterated over in the map");
 			std::shared_ptr<Directory> newRelPathDir = search->second;
 
-			ResolveDirectoryMapLinks(newDirPath, relPathToDir / dir->GetPath().filename(), newRelPathDir);
+			ResolveChangedPathDirectory(newDirPath, relPathToDir / dir->GetName(), newRelPathDir);
+		}
+	}
+	*/
+
+	DirectoryTree::EntityPathPairs DirectoryTree::ConstructDirEntityPathPairs(std::shared_ptr<Directory> dir)
+	{
+		EntityPathPairs entities;
+		entities.push_back(std::make_pair(dir, dir->GetPath()));
+		for (const auto& entity : dir->GetDirEntriesRecursive())
+		{
+			entities.push_back(std::make_pair(entity, entity->GetPath()));
+		}
+		return entities;
+	}
+	void DirectoryTree::ProcessPathChanges(const DirectoryTree::EntityPathPairs& oldPathPairs)
+	{
+		for (const auto& entity : oldPathPairs)
+		{
+			if (entity.first->IsDirectory())
+			{
+				std::shared_ptr<Directory> dir = std::static_pointer_cast<Directory>(entity.first);
+
+				directories.erase(entity.second);
+				directories.insert({ dir->GetPath(), dir});
+
+				NotifyDirectoryPathChanged(dir, entity.second);
+			}
+			else /* if (entity.first->IsFile()) */
+			{
+				NotifyFilePathChanged(std::static_pointer_cast<File>(entity.first), entity.second);
+			}
 		}
 	}
 }

@@ -20,11 +20,14 @@ namespace fs
 	class DirectoryTreeEventListener
 	{
 	public:
+		virtual void OnFileAdded(std::shared_ptr<File> file) = 0;
 		virtual void OnDirectoryAdded(std::shared_ptr<Directory> dir) = 0;
+
+		virtual void OnFileRemoved(std::shared_ptr<File> file) = 0;
 		virtual void OnDirectoryRemoved(std::shared_ptr<Directory> dir) = 0;
 
-		virtual void OnFileAdded(std::shared_ptr<File> file) = 0;
-		virtual void OnFileRemoved(std::shared_ptr<File> file) = 0;
+		virtual void OnFilePathChanged(std::shared_ptr<File> file, const std::filesystem::path& oldPath) = 0;
+		virtual void OnDirectoryPathChanged(std::shared_ptr<Directory> dir, const std::filesystem::path& oldPath) = 0;
 
 		virtual void OnFileModified(std::shared_ptr<File> file) = 0;
 		virtual void OnDirectoryModified(std::shared_ptr<Directory> dir) = 0;
@@ -70,10 +73,12 @@ namespace fs
 
 		void NotifyDirectoryAdded(std::shared_ptr<Directory> dir);
 		void NotifyDirectoryRemoved(std::shared_ptr<Directory> dir);
+		void NotifyDirectoryPathChanged(std::shared_ptr<Directory> dir, const std::filesystem::path& oldPath);
 		void NotifyDirectoryModified(std::shared_ptr<Directory> dir);
 
 		void NotifyFileAdded(std::shared_ptr<File> file);
 		void NotifyFileRemoved(std::shared_ptr<File> file);
+		void NotifyFilePathChanged(std::shared_ptr<File> file, const std::filesystem::path& oldPath);
 		void NotifyFileModified(std::shared_ptr<File> file);
 
 		std::shared_ptr<File> CreateFile(const std::filesystem::path& relPath) const;
@@ -82,10 +87,17 @@ namespace fs
 		std::shared_ptr<Directory> BuildTree(const std::filesystem::path& dirPath);
 
 		// Change 'old path' to 'new path' links
-		void ResolveDirectoryMapLinks(
+		/*
+		void ResolveChangedPathDirectory(
 			const std::filesystem::path& newDirPath,
 			const std::filesystem::path& relPathToDir,
 			std::shared_ptr<Directory> relPathDir);
+		*/
+
+		using EntityPathPairs = std::vector<std::pair<std::shared_ptr<DirectoryEntry>, std::filesystem::path>>;
+
+		EntityPathPairs ConstructDirEntityPathPairs(std::shared_ptr<Directory> dir);
+		void ProcessPathChanges(const EntityPathPairs& oldPathPairs);
 
 		std::unordered_map<
 			std::filesystem::path,
