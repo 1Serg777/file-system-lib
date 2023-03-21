@@ -15,45 +15,45 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\FileSystemApi.h">
+    <ClInclude Include="include\FileSystem\DirectoryTree.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\DirectoryTree.h">
+    <ClInclude Include="include\FileSystem\FileSystemApi.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\FileSystemCommon.h">
+    <ClInclude Include="include\FileSystem\FileSystemCommon.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\FileSystemWatcher.h">
+    <ClInclude Include="include\FileSystem\FileSystemWatcher.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Timer.h">
+    <ClInclude Include="include\FileSystem\Timer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Utility.h">
+    <ClInclude Include="include\FileSystem\Utility.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\WinFileWatcher.h">
+    <ClInclude Include="include\FileSystem\WinFileWatcher.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\DirectoryTree.cpp">
+    <ClCompile Include="src\FileSystem\DirectoryTree.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\FileSystemCommon.cpp">
+    <ClCompile Include="src\FileSystem\FileSystemCommon.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\FileSystemWatcher.cpp">
+    <ClCompile Include="src\FileSystem\FileSystemWatcher.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Timer.cpp">
+    <ClCompile Include="src\FileSystem\Timer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Utility.cpp">
+    <ClCompile Include="src\FileSystem\Utility.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\WinFileWatcher.cpp">
+    <ClCompile Include="src\FileSystem\WinFileWatcher.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

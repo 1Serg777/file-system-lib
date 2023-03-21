@@ -18,6 +18,23 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\FileSystem\DirectoryTree.h" />
+    <ClInclude Include="include\FileSystem\FileSystemApi.h" />
+    <ClInclude Include="include\FileSystem\FileSystemCommon.h" />
+    <ClInclude Include="include\FileSystem\FileSystemWatcher.h" />
+    <ClInclude Include="include\FileSystem\Timer.h" />
+    <ClInclude Include="include\FileSystem\Utility.h" />
+    <ClInclude Include="include\FileSystem\WinFileWatcher.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\FileSystem\DirectoryTree.cpp" />
+    <ClCompile Include="src\FileSystem\FileSystemCommon.cpp" />
+    <ClCompile Include="src\FileSystem\FileSystemWatcher.cpp" />
+    <ClCompile Include="src\FileSystem\Timer.cpp" />
+    <ClCompile Include="src\FileSystem\Utility.cpp" />
+    <ClCompile Include="src\FileSystem\WinFileWatcher.cpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
@@ -146,23 +163,6 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClInclude Include="include\DirectoryTree.h" />
-    <ClInclude Include="include\FileSystemApi.h" />
-    <ClInclude Include="include\FileSystemCommon.h" />
-    <ClInclude Include="include\FileSystemWatcher.h" />
-    <ClInclude Include="include\Timer.h" />
-    <ClInclude Include="include\Utility.h" />
-    <ClInclude Include="include\WinFileWatcher.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="src\DirectoryTree.cpp" />
-    <ClCompile Include="src\FileSystemCommon.cpp" />
-    <ClCompile Include="src\FileSystemWatcher.cpp" />
-    <ClCompile Include="src\Timer.cpp" />
-    <ClCompile Include="src\Utility.cpp" />
-    <ClCompile Include="src\WinFileWatcher.cpp" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

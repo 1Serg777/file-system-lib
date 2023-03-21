@@ -1,6 +1,6 @@
-#include "../include/WinFileWatcher.h"
+#include "../../include/FileSystem/WinFileWatcher.h"
 
-#include "../include/FileSystemWatcher.h"
+#include "../../include/FileSystem/FileSystemWatcher.h"
 
 #include <array>
 #include <cassert>

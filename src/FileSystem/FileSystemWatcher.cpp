@@ -1,4 +1,4 @@
-#include "../include/FileSystemWatcher.h"
+#include "../../include/FileSystem/FileSystemWatcher.h"
 
 #include <tchar.h>
 
