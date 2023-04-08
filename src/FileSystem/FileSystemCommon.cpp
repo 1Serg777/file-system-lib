@@ -99,6 +99,13 @@ namespace fs
 		UpdatePath();
 	}
 
+	std::shared_ptr<Directory> DirectoryEntry::GetParentDirectory() const
+	{
+		if (!parentDir.expired())
+			return parentDir.lock();
+		return std::shared_ptr<Directory>{};
+	}
+
 	bool DirectoryEntry::Exists() const
 	{
 		return std::filesystem::exists(dirEntryPath);
@@ -322,6 +329,11 @@ namespace fs
 		if (result == std::end(files))
 			return false;
 		return true;
+	}
+
+	bool Directory::IsEmpty() const
+	{
+		return files.size() == 0 && directories.size() == 0;
 	}
 
 	std::string Directory::GetDirectoryName() const

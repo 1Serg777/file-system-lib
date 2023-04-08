@@ -89,6 +89,8 @@ namespace fs
 		FS_API void SetParentDirectory(std::shared_ptr<Directory> parentDir);
 		FS_API void ClearParentDirectory();
 
+		FS_API std::shared_ptr<Directory> GetParentDirectory() const;
+
 		FS_API bool Exists() const;
 
 		FS_API void UpdateStatus(const std::filesystem::path& absPart);
@@ -152,6 +154,8 @@ namespace fs
 
 		FS_API bool DirectoryExists(const std::string& dirName);
 		FS_API bool FileExists(const std::string& fileName);
+
+		FS_API bool IsEmpty() const;
 
 		FS_API std::string GetDirectoryName() const;
 
